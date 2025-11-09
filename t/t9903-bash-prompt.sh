@@ -25,14 +25,19 @@ c_clear='\001\e[0m\002'
 #                                       (b2)
 test_expect_success 'setup for prompt tests' '
 	git init otherrepo &&
+	git init --bare origin.git &&
+	git remote add origin origin.git &&
 	test_commit --annotate initial file contents1 t1 &&
+	git push --set-upstream origin main &&
 	git checkout -b b1 &&
 	test_commit --no-tag second-b1 file &&
 	test_commit --annotate third-b1 file contents2 t2 &&
+	git push --set-upstream origin b1 &&
 	git checkout -b b2 main &&
 	test_commit --no-tag second-b2 file &&
 	test_commit --no-tag another-b2 file &&
 	test_commit --no-tag yet-another-b2 file &&
+	git push --set-upstream origin b2 &&
 	mkdir ignored_dir &&
 	echo "ignored_dir/" >>.gitignore &&
 	git checkout main
