@@ -43,6 +43,66 @@ test_expect_success 'setup for prompt tests' '
 	git checkout main
 '
 
+test_expect_success 'prompt - upstream - short - equal' '
+	printf " (main =)" >expected &&
+	GIT_PS1_SHOWUPSTREAM=yes &&
+	test_when_finished "sane_unset GIT_PS1_SHOWUPSTREAM" &&
+	__git_ps1 >"$actual" &&
+	test_cmp expected "$actual"
+'
+
+test_expect_success 'prompt - upstream - short - ahead' '
+	printf " (main >)" >expected &&
+	GIT_PS1_SHOWUPSTREAM=yes &&
+	test_when_finished "sane_unset GIT_PS1_SHOWUPSTREAM" &&
+	test_commit --no-tag ahead &&
+	test_when_finished "git reset HEAD^" &&
+	__git_ps1 >"$actual" &&
+	test_cmp expected "$actual"
+'
+
+test_expect_success 'prompt - upstream - short - behind' '
+	printf " (b1 <)" >expected &&
+	GIT_PS1_SHOWUPSTREAM=yes &&
+	test_when_finished "sane_unset GIT_PS1_SHOWUPSTREAM" &&
+	git checkout b1 &&
+	test_when_finished "git checkout main" &&
+	git reset HEAD^ &&
+	test_when_finished "git reset @{u}" &&
+	__git_ps1 >"$actual" &&
+	test_cmp expected "$actual"
+'
+
+test_expect_success 'prompt - upstream - verbose - equal' '
+	printf " (main|u=)" >expected &&
+	GIT_PS1_SHOWUPSTREAM=verbose &&
+	test_when_finished "sane_unset GIT_PS1_SHOWUPSTREAM" &&
+	__git_ps1 >"$actual" &&
+	test_cmp expected "$actual"
+'
+
+test_expect_success 'prompt - upstream - verbose - ahead' '
+	printf " (main|u+1)" >expected &&
+	GIT_PS1_SHOWUPSTREAM=verbose &&
+	test_when_finished "sane_unset GIT_PS1_SHOWUPSTREAM" &&
+	test_commit --no-tag ahead &&
+	test_when_finished "git reset HEAD^" &&
+	__git_ps1 >"$actual" &&
+	test_cmp expected "$actual"
+'
+
+test_expect_success 'prompt - upstream - verbose - behind' '
+	printf " (b1|u-1)" >expected &&
+	GIT_PS1_SHOWUPSTREAM=verbose &&
+	test_when_finished "sane_unset GIT_PS1_SHOWUPSTREAM" &&
+	git checkout b1 &&
+	test_when_finished "git checkout main" &&
+	git reset HEAD^ &&
+	test_when_finished "git reset @{u}" &&
+	__git_ps1 >"$actual" &&
+	test_cmp expected "$actual"
+'
+
 test_expect_success 'prompt - branch name' '
 	printf " (main)" >expected &&
 	__git_ps1 >"$actual" &&
